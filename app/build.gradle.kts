@@ -36,6 +36,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.osmdroid.android)
     implementation(platform(libs.androidx.compose.bom))
     implementation("androidx.compose.material:material-icons-extended:1.6.8")
     implementation(libs.androidx.activity.compose)

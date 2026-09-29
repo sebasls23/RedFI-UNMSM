@@ -47,6 +47,8 @@ fun MainScreen() {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        // AQUÍ ESTÁ LA MAGIA: Se desactivan los gestos de deslizamiento si estás en la pestaña 0 (Bus Burrito)
+        gesturesEnabled = selectedTab != 0,
         drawerContent = {
             ModalDrawerSheet {
                 // Cabecera del menú lateral
@@ -97,6 +99,7 @@ fun MainScreen() {
             }
         }
     ) {
+        // Resto de tu código (Scaffold, barras, etc.)...
         Scaffold(
             topBar = {
                 TopAppBar(
