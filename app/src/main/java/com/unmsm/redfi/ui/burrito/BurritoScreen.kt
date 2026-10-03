@@ -3,6 +3,10 @@ package com.unmsm.redfi.ui.burrito
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -209,17 +213,14 @@ fun BurritoScreen() {
                         controller.setCenter(centroCampus)
                         mapViewReference = this
 
-                        // Reemplaza esta parte dentro de tu factory { ctx: Context -> ... }
                         if (hasLocationPermission) {
-                            // Usamos el proveedor combinado de red y GPS para una respuesta inmediata
-                            val locationProvider = org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider(ctx).apply {
-                                // Permitir proveedor de red ayuda a que el emulador detecte ubicación más rápido
+                            val locationProvider = GpsMyLocationProvider(ctx).apply {
                                 addLocationSource(android.location.LocationManager.NETWORK_PROVIDER)
                             }
 
                             val locationOverlay = MyLocationNewOverlay(locationProvider, this).apply {
-                                enableMyLocation()     // Habilita el punto azul
-                                enableFollowLocation() // Centra la cámara automáticamente en ti
+                                enableMyLocation()
+                                enableFollowLocation()
                             }
                             overlays.add(locationOverlay)
                             myLocationOverlayRef = locationOverlay
@@ -230,13 +231,13 @@ fun BurritoScreen() {
                     mapView.overlays.removeAll { it is Marker }
                     val ctx = mapView.context
 
-                    // Marcadores fijos de facultades con iconos personalizados
+                    // Marcadores fijos de facultades escalados de forma segura
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoSistemas
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Facultad de Ing. de Sistemas (FISI #20)"
                         snippet = "Paradero inicial"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.fisilogo)
+                        icon = scaleIcon(ctx, R.drawable.fisilogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -244,7 +245,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Facultad de Ing. Metalúrgica (#2)"
                         snippet = "Paradero zona norte"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.metalurgicalogo)
+                        icon = scaleIcon(ctx, R.drawable.metalurgicalogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -252,7 +253,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Paradero Zona Puerta 2"
                         snippet = "Zona oeste del campus"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.puertadoslogo)
+                        icon = scaleIcon(ctx, R.drawable.puertadoslogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -260,7 +261,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Biblioteca Central (#16)"
                         snippet = "Zona académica principal"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.bibliotecalogo)
+                        icon = scaleIcon(ctx, R.drawable.bibliotecalogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -268,7 +269,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Facultad de Odontología (#18)"
                         snippet = "Paradero zona sur"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.odontologialogo)
+                        icon = scaleIcon(ctx, R.drawable.odontologialogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -276,16 +277,16 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Comedor Universitario"
                         snippet = "Paradero zona de abastos"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.comedorlogo)
+                        icon = scaleIcon(ctx, R.drawable.comedorlogo, 40, 40)
                     })
 
-                    // Bus Burrito en movimiento
+                    // Bus Burrito en movimiento escalado de forma segura
                     val busMarker = Marker(mapView).apply {
                         position = busPosition
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
                         title = "Bus Burrito 🚌"
                         snippet = "En recorrido interno por el campus"
-                        icon = ContextCompat.getDrawable(ctx, R.drawable.burritologo)
+                        icon = scaleIcon(ctx, R.drawable.burritologo, 44, 22)
                     }
                     mapView.overlays.add(busMarker)
 
@@ -334,4 +335,41 @@ fun BurritoScreen() {
             }
         }
     }
+}
+
+// Función auxiliar segura que convierte PNGs o Vectores XML a Bitmap sin hacer crash
+// Función auxiliar para escalar manteniendo la proporción original (sin deformar)
+fun scaleIcon(context: Context, drawableId: Int, targetWidth: Int, targetHeight: Int): Drawable {
+    val drawable = ContextCompat.getDrawable(context, drawableId)!!
+    val bitmap = if (drawable is BitmapDrawable) {
+        drawable.bitmap
+    } else {
+        val bmp = Bitmap.createBitmap(
+            if (drawable.intrinsicWidth >  0) drawable.intrinsicWidth else targetWidth,
+            if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else targetHeight,
+            Bitmap.Config.ARGB_8888
+        )
+        val canvas = Canvas(bmp)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.draw(canvas)
+        bmp
+    }
+
+    // Calculamos la proporción (aspect ratio) para evitar deformaciones
+    val originalWidth = bitmap.width.toFloat()
+    val originalHeight = bitmap.height.toFloat()
+
+    var newWidth = targetWidth.toFloat()
+    var newHeight = targetHeight.toFloat()
+
+    if (originalWidth > originalHeight) {
+        // Es más ancho que alto
+        newHeight = (originalHeight * targetWidth) / originalWidth
+    } else {
+        // Es más alto que ancho (o cuadrado)
+        newWidth = (originalWidth * targetHeight) / originalHeight
+    }
+
+    val scaledBitmap = Bitmap.createScaledBitmap(bitmap, newWidth.toInt(), newHeight.toInt(), true)
+    return BitmapDrawable(context.resources, scaledBitmap)
 }
