@@ -54,24 +54,34 @@ fun BurritoScreen() {
     val ptoZonaPuerta2 = GeoPoint(-12.059417, -77.079626)
     val ptoOdontologia = GeoPoint(-12.054886, -77.086256)
     val ptoComedor = GeoPoint(-12.059324, -77.083105)
+    val ptoZonaPuerta3 = GeoPoint(-12.057408,-77.080280)
+    val ptoIndustrial = GeoPoint(-12.060407,-77.081071)
+    val ptoGeologica = GeoPoint(-12.060846, -77.083764)
+    val ptoZonaPuerta7 = GeoPoint(-12.054147, -77.084564)
 
     val rutaDetallada = listOf(
         ptoSistemas,
-        ptoMetalurgica,
-        ptoZonaPuerta2,
-        ptoBiblioteca,
         ptoOdontologia,
-        ptoComedor,
+        ptoBiblioteca,
+        ptoMetalurgica,
+        ptoGeologica,
+        ptoIndustrial,
+        ptoZonaPuerta2,
+        ptoZonaPuerta3,
+        ptoZonaPuerta7,
         ptoSistemas
     )
 
     val nombresParaderos = listOf(
-        "Facultad de Ing. Metalúrgica (#2)",
+        "Facultad de Odontología",
+        "Biblioteca Central",
+        "Facultad de Ing. Metalúrgica",
+        "Facultad de Ing. Geológica",
+        "Facultad de Ing. Industrial",
         "Paradero Zona Puerta 2",
-        "Biblioteca Central (#16)",
-        "Facultad de Odontología (#18)",
-        "Comedor Universitario",
-        "Facultad de Ing. de Sistemas (FISI #20)"
+        "Paradero Zona Puerta 3",
+        "Paradero Zona Puerta 7",
+        "Facultad de Ing. de Sistemas"
     )
 
     var busPosition by remember { mutableStateOf(ptoSistemas) }
@@ -235,31 +245,31 @@ fun BurritoScreen() {
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoSistemas
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Facultad de Ing. de Sistemas (FISI #20)"
-                        snippet = "Paradero inicial"
+                        title = "Facultad de Ing. de Sistemas"
+                        snippet = "Paradero zona norte"
                         icon = scaleIcon(ctx, R.drawable.fisilogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoMetalurgica
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Facultad de Ing. Metalúrgica (#2)"
-                        snippet = "Paradero zona norte"
+                        title = "Facultad de Ing. Metalúrgica"
+                        snippet = "Paradero zona comedor"
                         icon = scaleIcon(ctx, R.drawable.metalurgicalogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoZonaPuerta2
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Paradero Zona Puerta 2"
-                        snippet = "Zona oeste del campus"
+                        title = "Paradero Puerta 2"
+                        snippet = "Zona de entrada del campus"
                         icon = scaleIcon(ctx, R.drawable.puertadoslogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoBiblioteca
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Biblioteca Central (#16)"
+                        title = "Biblioteca Central"
                         snippet = "Zona académica principal"
                         icon = scaleIcon(ctx, R.drawable.bibliotecalogo, 40, 40)
                     })
@@ -267,8 +277,8 @@ fun BurritoScreen() {
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoOdontologia
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
-                        title = "Facultad de Odontología (#18)"
-                        snippet = "Paradero zona sur"
+                        title = "Facultad de Odontología"
+                        snippet = "Zona académica principal"
                         icon = scaleIcon(ctx, R.drawable.odontologialogo, 40, 40)
                     })
 
@@ -280,6 +290,37 @@ fun BurritoScreen() {
                         icon = scaleIcon(ctx, R.drawable.comedorlogo, 40, 40)
                     })
 
+                    mapView.overlays.add(Marker(mapView).apply {
+                        position = ptoIndustrial
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        title = "Facultad de Ing. Industrial"
+                        snippet = "Paradero zona sur"
+                        icon = scaleIcon(ctx, R.drawable.industriallogo, 40, 40)
+                    })
+
+                    mapView.overlays.add(Marker(mapView).apply {
+                        position = ptoZonaPuerta3
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        title = "Paradero Puerta 3"
+                        snippet = "Zona de entrada del campus"
+                        icon = scaleIcon(ctx, R.drawable.puertatreslogo,40,40)
+                    })
+
+                    mapView.overlays.add(Marker(mapView).apply {
+                        position = ptoGeologica
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        title = "Facultad de Ing. Geológica"
+                        snippet = "Paradero zona suroeste"
+                        icon = scaleIcon(ctx, R.drawable.geologicalogo,40,40)
+                    })
+
+                    mapView.overlays.add(Marker(mapView).apply {
+                        position = ptoZonaPuerta7
+                        setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
+                        title = "Paradero Puerta 7"
+                        snippet = "Zona de entrada del campus"
+                        icon = scaleIcon(ctx, R.drawable.puertasietelogo,40,40)
+                    })
                     // Bus Burrito en movimiento escalado de forma segura
                     val busMarker = Marker(mapView).apply {
                         position = busPosition

@@ -32,13 +32,13 @@ fun ShopScreen() {
         ) {
             Column {
                 Text(
-                    text = "RedFi Shop 🛍️",
+                    text = "ShopFi 🛍️",
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
                     color = RedFiGuinda
                 )
                 Text(
-                    text = "Merch oficial FISI - UNMSM",
+                    text = "Merch oficial UNMSM",
                     fontSize = 13.sp,
                     color = Color.Gray
                 )

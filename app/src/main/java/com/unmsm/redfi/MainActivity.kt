@@ -165,7 +165,7 @@ fun MainScreen() {
                     )
                     NavigationBarItem(
                         icon = { Text("🛒", fontSize = 20.sp) },
-                        label = { Text("RedFi Shop", fontSize = 11.sp) },
+                        label = { Text("ShopFi", fontSize = 11.sp) },
                         selected = selectedTab == 2,
                         onClick = { selectedTab = 2 },
                         colors = NavigationBarItemDefaults.colors(
