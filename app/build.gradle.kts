@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -53,4 +54,14 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Firebase BoM (Bill of Materials) para gestionar las versiones de forma limpia
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    // Firebase Authentication (Para el inicio de sesión)
+    implementation("com.google.firebase:firebase-auth")
+    // Cloud Firestore (Para guardar los datos de usuarios, bus y marketplace)
+    implementation("com.google.firebase:firebase-firestore")
+    // Credential Manager y dependencias de Google Sign-In para Android moderno
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
 }

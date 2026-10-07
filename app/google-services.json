@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "522858268121",
+    "project_id": "redfi-unmsm-26",
+    "storage_bucket": "redfi-unmsm-26.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:522858268121:android:fa63e09e66397e980885c8",
+        "android_client_info": {
+          "package_name": "com.unmsm.redfi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBwHiJTrN1GH81iE1RKlwk-_uEf6eXy6q0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

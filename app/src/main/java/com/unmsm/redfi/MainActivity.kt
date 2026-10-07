@@ -19,9 +19,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 import com.unmsm.redfi.ui.burrito.BurritoScreen
 import com.unmsm.redfi.ui.community.CommunityScreen
 import com.unmsm.redfi.ui.shop.ShopScreen
+import com.unmsm.redfi.ui.login.LoginScreen
 import com.unmsm.redfi.ui.theme.RedFiGuinda
 import com.unmsm.redfi.ui.theme.RedFiTheme
 import kotlinx.coroutines.launch
@@ -32,7 +34,19 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             RedFiTheme {
-                MainScreen()
+                // Verificamos de forma persistente si Firebase Auth ya tiene una sesión activa
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                var isLoggedIn by remember { mutableStateOf(currentUser != null) }
+
+                if (!isLoggedIn) {
+                    LoginScreen(
+                        onLoginSuccess = {
+                            isLoggedIn = true
+                        }
+                    )
+                } else {
+                    MainScreen()
+                }
             }
         }
     }
@@ -47,7 +61,7 @@ fun MainScreen() {
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        // AQUÍ ESTÁ LA MAGIA: Se desactivan los gestos de deslizamiento si estás en la pestaña 0 (Bus Burrito)
+        // Se desactivan los gestos de deslizamiento si estás en la pestaña 0 (Bus Burrito)
         gesturesEnabled = selectedTab != 0,
         drawerContent = {
             ModalDrawerSheet {
@@ -99,7 +113,6 @@ fun MainScreen() {
             }
         }
     ) {
-        // Resto de tu código (Scaffold, barras, etc.)...
         Scaffold(
             topBar = {
                 TopAppBar(
@@ -149,7 +162,7 @@ fun MainScreen() {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = RedFiGuinda,
                             selectedTextColor = RedFiGuinda,
-                            indicatorColor = RedFiGuinda.copy(alpha = 0.12f) // Pastilla moderna translúcida
+                            indicatorColor = RedFiGuinda.copy(alpha = 0.12f)
                         )
                     )
                     NavigationBarItem(

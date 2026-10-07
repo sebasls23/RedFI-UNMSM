@@ -12,9 +12,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DirectionsBus
 import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -36,6 +38,7 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.Polyline
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
 
@@ -54,34 +57,41 @@ fun BurritoScreen() {
     val ptoZonaPuerta2 = GeoPoint(-12.059417, -77.079626)
     val ptoOdontologia = GeoPoint(-12.054886, -77.086256)
     val ptoComedor = GeoPoint(-12.059324, -77.083105)
-    val ptoZonaPuerta3 = GeoPoint(-12.057408,-77.080280)
-    val ptoIndustrial = GeoPoint(-12.060407,-77.081071)
+    val ptoZonaPuerta3 = GeoPoint(-12.057408, -77.080280)
+    val ptoIndustrial = GeoPoint(-12.060407, -77.081071)
     val ptoGeologica = GeoPoint(-12.060846, -77.083764)
     val ptoZonaPuerta7 = GeoPoint(-12.054147, -77.084564)
 
+    val curvaNorteSistemasBiblioteca = GeoPoint(-12.054200, -77.086000)
+    val curvaSurMetalurgica = GeoPoint(-12.060500, -77.084100)
+    val curvaEstePuertas = GeoPoint(-12.058500, -77.079800)
+
     val rutaDetallada = listOf(
         ptoSistemas,
+        curvaNorteSistemasBiblioteca,
         ptoOdontologia,
         ptoBiblioteca,
         ptoMetalurgica,
+        curvaSurMetalurgica,
         ptoGeologica,
         ptoIndustrial,
         ptoZonaPuerta2,
+        curvaEstePuertas,
         ptoZonaPuerta3,
         ptoZonaPuerta7,
         ptoSistemas
     )
 
     val nombresParaderos = listOf(
+        "Facultad de Sistemas",
         "Facultad de Odontología",
         "Biblioteca Central",
-        "Facultad de Ing. Metalúrgica",
-        "Facultad de Ing. Geológica",
-        "Facultad de Ing. Industrial",
-        "Paradero Zona Puerta 2",
-        "Paradero Zona Puerta 3",
-        "Paradero Zona Puerta 7",
-        "Facultad de Ing. de Sistemas"
+        "Ing. Metalúrgica",
+        "Ing. Geológica",
+        "Ing. Industrial",
+        "Puerta 2",
+        "Puerta 3",
+        "Puerta 7"
     )
 
     var busPosition by remember { mutableStateOf(ptoSistemas) }
@@ -123,7 +133,7 @@ fun BurritoScreen() {
                     val start = rutaDetallada[i]
                     val end = rutaDetallada[i + 1]
 
-                    nextStopText = nombresParaderos[i]
+                    nextStopText = nombresParaderos.getOrElse(i) { "Paradero interno" }
 
                     val pasos = 20
                     for (step in 1..pasos) {
@@ -200,7 +210,27 @@ fun BurritoScreen() {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(12.dp))
+
+        // Selector horizontal interactivo de paraderos para centrar el mapa al hacer clic
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            items(nombresParaderos.size) { index ->
+                val puntoParadero = rutaDetallada[index]
+                AssistChip(
+                    onClick = {
+                        mapViewReference?.controller?.animateTo(puntoParadero)
+                        mapViewReference?.controller?.setZoom(17.5)
+                    },
+                    label = { Text(nombresParaderos[index], fontSize = 11.sp) },
+                    colors = AssistChipDefaults.assistChipColors(containerColor = Color.White)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Contenedor del Mapa
         Box(
@@ -230,7 +260,7 @@ fun BurritoScreen() {
 
                             val locationOverlay = MyLocationNewOverlay(locationProvider, this).apply {
                                 enableMyLocation()
-                                enableFollowLocation()
+                                disableFollowLocation()
                             }
                             overlays.add(locationOverlay)
                             myLocationOverlayRef = locationOverlay
@@ -238,10 +268,18 @@ fun BurritoScreen() {
                     }
                 },
                 update = { mapView ->
-                    mapView.overlays.removeAll { it is Marker }
+                    mapView.overlays.removeAll { it is Marker || it is Polyline }
                     val ctx = mapView.context
 
-                    // Marcadores fijos de facultades escalados de forma segura
+                    // 1. Trazar la línea de la ruta en el mapa (Polyline)
+                    val lineaRuta = Polyline().apply {
+                        setPoints(rutaDetallada)
+                        outlinePaint.color = android.graphics.Color.parseColor("#800020") // Guinda institucional
+                        outlinePaint.strokeWidth = 9f
+                    }
+                    mapView.overlays.add(lineaRuta)
+
+                    // 2. Marcadores fijos de facultades y paraderos
                     mapView.overlays.add(Marker(mapView).apply {
                         position = ptoSistemas
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -303,7 +341,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         title = "Paradero Puerta 3"
                         snippet = "Zona de entrada del campus"
-                        icon = scaleIcon(ctx, R.drawable.puertatreslogo,40,40)
+                        icon = scaleIcon(ctx, R.drawable.puertatreslogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -311,7 +349,7 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         title = "Facultad de Ing. Geológica"
                         snippet = "Paradero zona suroeste"
-                        icon = scaleIcon(ctx, R.drawable.geologicalogo,40,40)
+                        icon = scaleIcon(ctx, R.drawable.geologicalogo, 40, 40)
                     })
 
                     mapView.overlays.add(Marker(mapView).apply {
@@ -319,9 +357,10 @@ fun BurritoScreen() {
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_CENTER)
                         title = "Paradero Puerta 7"
                         snippet = "Zona de entrada del campus"
-                        icon = scaleIcon(ctx, R.drawable.puertasietelogo,40,40)
+                        icon = scaleIcon(ctx, R.drawable.puertasietelogo, 40, 40)
                     })
-                    // Bus Burrito en movimiento escalado de forma segura
+
+                    // 3. Bus Burrito en movimiento
                     val busMarker = Marker(mapView).apply {
                         position = busPosition
                         setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
@@ -336,7 +375,26 @@ fun BurritoScreen() {
                 modifier = Modifier.fillMaxSize()
             )
 
-            // Botón flotante de ubicación
+            // Botón flotante superior para seguir al Bus Burrito en tiempo real
+            FloatingActionButton(
+                onClick = {
+                    mapViewReference?.controller?.animateTo(busPosition)
+                    mapViewReference?.controller?.setZoom(17.5)
+                },
+                containerColor = RedFiGuinda,
+                contentColor = Color.White,
+                shape = CircleShape,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 80.dp, end = 16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.DirectionsBus,
+                    contentDescription = "Seguir Bus Burrito"
+                )
+            }
+
+            // Botón flotante inferior para centrar en la ubicación propia del usuario
             FloatingActionButton(
                 onClick = {
                     myLocationOverlayRef?.myLocation?.let { myGeoPoint ->
@@ -357,7 +415,7 @@ fun BurritoScreen() {
                 )
             }
 
-            // Etiqueta flotante superior
+            // Etiqueta flotante superior de estado GPS
             Surface(
                 modifier = Modifier
                     .align(Alignment.TopEnd)
@@ -378,7 +436,6 @@ fun BurritoScreen() {
     }
 }
 
-// Función auxiliar segura que convierte PNGs o Vectores XML a Bitmap sin hacer crash
 // Función auxiliar para escalar manteniendo la proporción original (sin deformar)
 fun scaleIcon(context: Context, drawableId: Int, targetWidth: Int, targetHeight: Int): Drawable {
     val drawable = ContextCompat.getDrawable(context, drawableId)!!
@@ -386,7 +443,7 @@ fun scaleIcon(context: Context, drawableId: Int, targetWidth: Int, targetHeight:
         drawable.bitmap
     } else {
         val bmp = Bitmap.createBitmap(
-            if (drawable.intrinsicWidth >  0) drawable.intrinsicWidth else targetWidth,
+            if (drawable.intrinsicWidth > 0) drawable.intrinsicWidth else targetWidth,
             if (drawable.intrinsicHeight > 0) drawable.intrinsicHeight else targetHeight,
             Bitmap.Config.ARGB_8888
         )
@@ -396,7 +453,6 @@ fun scaleIcon(context: Context, drawableId: Int, targetWidth: Int, targetHeight:
         bmp
     }
 
-    // Calculamos la proporción (aspect ratio) para evitar deformaciones
     val originalWidth = bitmap.width.toFloat()
     val originalHeight = bitmap.height.toFloat()
 
@@ -404,10 +460,8 @@ fun scaleIcon(context: Context, drawableId: Int, targetWidth: Int, targetHeight:
     var newHeight = targetHeight.toFloat()
 
     if (originalWidth > originalHeight) {
-        // Es más ancho que alto
         newHeight = (originalHeight * targetWidth) / originalWidth
     } else {
-        // Es más alto que ancho (o cuadrado)
         newWidth = (originalWidth * targetHeight) / originalHeight
     }
 
