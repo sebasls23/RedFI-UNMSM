@@ -17,7 +17,7 @@ Tecnologías y Librerías
 Cómo Probar la Aplicación
 Dado que el archivo de configuración de Firebase se mantiene privado por seguridad, puedes probar la aplicación directamente descargando la última versión estable:
 
-[Descarga el APK aquí desde GitHub Releases](ENLACE_DE_TUS_RELEASES)
+[Descarga el APK aquí desde GitHub Releases](https://github.com/sebasls23/RedFI-UNMSM/releases/tag/v1.0.0)
 
 Autor
 - Sebastian Tadeo Lozano Silvera 
