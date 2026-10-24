@@ -102,7 +102,7 @@ fun ShopScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 0.dp)
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // --- ENCABEZADO DE SHOPFI ---
@@ -384,6 +384,29 @@ fun AddProductDialog(onDismiss: () -> Unit) {
     val conditions = listOf("Nuevo", "Usado", "Como nuevo")
     val emojis = listOf("🛍️", "👕", "📚", "🧮", "☕", "💻", "⚡")
 
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var sellerName by remember { mutableStateOf(currentUser?.displayName ?: "Estudiante UNMSM") }
+
+    // Cargar datos dinámicos del usuario desde Firestore
+    LaunchedEffect(Unit) {
+        currentUser?.uid?.let { uid ->
+            FirebaseFirestore.getInstance().collection("users").document(uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val fetchedName = document.getString("name") ?: document.getString("fullName")
+                        val fetchedCareer = document.getString("career") ?: document.getString("role")
+                        if (!fetchedName.isNullOrBlank()) {
+                            sellerName = if (!fetchedCareer.isNullOrBlank()) {
+                                "$fetchedName ($fetchedCareer)"
+                            } else {
+                                fetchedName
+                            }
+                        }
+                    }
+                }
+        }
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
@@ -392,7 +415,6 @@ fun AddProductDialog(onDismiss: () -> Unit) {
                     val price = priceStr.toDoubleOrNull() ?: 0.0
 
                     if (name.isNotBlank()) {
-                        val vendedorReal = "Sebastian Tadeo Lozano (III Ciclo)"
                         val celularFinal = if (phoneStr.isNotBlank()) "51${phoneStr.trim()}" else "51999999999"
 
                         val newItem = ShopItem(
@@ -402,7 +424,7 @@ fun AddProductDialog(onDismiss: () -> Unit) {
                             condition = condition,
                             iconEmoji = iconEmoji,
                             description = description,
-                            seller = vendedorReal,
+                            seller = sellerName, // <-- Nombre dinámico y real del usuario
                             sellerPhone = celularFinal,
                             timestamp = System.currentTimeMillis()
                         )
