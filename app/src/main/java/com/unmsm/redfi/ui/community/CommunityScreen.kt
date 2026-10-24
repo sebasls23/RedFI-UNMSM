@@ -102,7 +102,7 @@ fun CommunityScreen() {
             FloatingActionButton(
                 onClick = {
                     if (selectedMainTab == 0 && !isUserOfficialAuthorized) {
-                        showNotAuthorizedDialog = true // Muestra la explicación detallada
+                        showNotAuthorizedDialog = true
                     } else {
                         showAddDialog = true
                     }
@@ -117,7 +117,7 @@ fun CommunityScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(top = 0.dp)
+                .padding(paddingValues)
                 .background(MaterialTheme.colorScheme.background)
         ) {
             // --- ENCABEZADO DE COMUNIDAD ---
@@ -362,8 +362,28 @@ fun AddPostDialog(
     var selectedTargetFaculty by remember { mutableStateOf(currentFaculty) }
     var expandedDropdown by remember { mutableStateOf(false) }
 
-    val realName = "Sebastian Tadeo Lozano"
-    val realRole = "Ingeniería de Software • III Ciclo"
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var userName by remember { mutableStateOf(currentUser?.displayName ?: "Estudiante UNMSM") }
+    var userRole by remember { mutableStateOf("Estudiante UNMSM") }
+
+    // Obtenemos de forma dinámica los datos reales del usuario desde Firestore
+    LaunchedEffect(Unit) {
+        currentUser?.uid?.let { uid ->
+            FirebaseFirestore.getInstance().collection("users").document(uid).get()
+                .addOnSuccessListener { document ->
+                    if (document != null && document.exists()) {
+                        val fetchedName = document.getString("name") ?: document.getString("fullName")
+                        if (!fetchedName.isNullOrBlank()) {
+                            userName = fetchedName
+                        }
+                        val fetchedRole = document.getString("role") ?: document.getString("career")
+                        if (!fetchedRole.isNullOrBlank()) {
+                            userRole = fetchedRole
+                        }
+                    }
+                }
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -448,8 +468,8 @@ fun AddPostDialog(
                         val finalIsOfficial = if (isUserAuthorized) publishAsOfficial else false
                         val newPost = Post(
                             id = "",
-                            author = realName,
-                            facultyOrRole = realRole,
+                            author = userName,
+                            facultyOrRole = userRole,
                             facultyTarget = if (finalIsOfficial) "UNMSM" else selectedTargetFaculty,
                             time = System.currentTimeMillis(),
                             content = textContent,
