@@ -1,0 +1,50 @@
+# Built application files
+*.apk
+*.apks
+*.aab
+
+# Files for the Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration file (sdk.dir, etc.)
+local.properties
+
+# JNI libraries (.so, .dll, .dylib)
+lib/
+
+# Previews
+.idea/previews/
+
+# Google Services (Seguridad para Firebase)
+/app/google-services.json
+
+# Profiling
+*.hprof
+
+# Android Studio Navigation editor temp files
+.navigation/
+
+# OS specific files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+.idea/assetWizardSettings.xml
+.idea/caches/
