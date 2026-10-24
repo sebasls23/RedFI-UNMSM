@@ -11,8 +11,8 @@ Características Principales
 Tecnologías y Librerías
 - Lenguaje: Kotlin
 - Interfaz de Usuario: Jetpack Compose (Material 3)
-- **Autenticación & Base de Datos: Firebase Authentication (Credential Manager) & Cloud Firestore
-- **Arquitectura: Componentes modernos de Android
+- Autenticación & Base de Datos: Firebase Authentication (Credential Manager) & Cloud Firestore
+- Arquitectura: Componentes modernos de Android
 
 Cómo Probar la Aplicación
 Dado que el archivo de configuración de Firebase se mantiene privado por seguridad, puedes probar la aplicación directamente descargando la última versión estable:
